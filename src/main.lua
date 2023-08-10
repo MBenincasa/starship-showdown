@@ -19,4 +19,5 @@ end
 -- This method is called immediately after love.update() within the game cycle. This is where objects, images, and any visual elements on the screen are drawn.
 function love.draw()
     ship:draw()
+    ship:debug()
 end
