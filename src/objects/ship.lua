@@ -33,15 +33,21 @@ function Ship:update(dt)
         local deceleration = self.acceleration * 0.05 * dt -- Calculate deceleration based on ship's acceleration and delta time
         local dotProduct = self.velocity.x * math.sin(self.rotation) + self.velocity.y * -math.cos(self.rotation) -- Calculate dot product of velocity and forward direction
         local directionAngle = self:getDirectionAngle()
-        local decelerationFactor = 1 - math.abs(directionAngle) / 90 -- Calculate a deceleration factor based on direction angle
-        local adjustedDeceleration = deceleration * decelerationFactor -- Adjusted deceleration based on deceleration factor
 
-        -- Apply deceleration only if the dot product is positive (ship moving forward)
+        -- Calculate the factor by which to scale the deceleration based on direction angle
+        local decelerationFactor = 1 - math.abs(directionAngle) / 90
+
         if dotProduct > 0 then
-            self.velocity.x = self.velocity.x - self.velocity.x * adjustedDeceleration
-            self.velocity.y = self.velocity.y - self.velocity.y * adjustedDeceleration
+            -- Apply deceleration in the forward direction
+            self.velocity.x = self.velocity.x - self.velocity.x * deceleration * decelerationFactor
+            self.velocity.y = self.velocity.y - self.velocity.y * deceleration * decelerationFactor
+        else
+            -- Apply deceleration in the backward direction
+            self.velocity.x = self.velocity.x + self.velocity.x * deceleration * decelerationFactor
+            self.velocity.y = self.velocity.y + self.velocity.y * deceleration * decelerationFactor
         end
     end
+    
 
     -- Calculate the total speed (modulo of the velocity vector)
     local speed = self:getSpeed()
