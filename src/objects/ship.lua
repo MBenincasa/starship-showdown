@@ -3,11 +3,11 @@ Ship.__index = Ship -- Set the index of the "Ship" table to itself
 
 function Ship.new(x, y)
     local self = setmetatable({}, Ship) -- Create a new instance (object) of the Ship class
-    self.x = x or 100
-    self.y = y or 300
+    self.x = x or 640
+    self.y = y or 600
     self.velocity = { x = 0, y = 0 } -- Velocity vector
-    self.acceleration = 150 -- Ship acceleration
-    self.maxSpeed = 300 -- Maximum speed of the ship
+    self.acceleration = 50 -- Ship acceleration
+    self.maxSpeed = 100 -- Maximum speed of the ship
     self.rotation = 0 -- Rotation angle of the ship in radians
     return self
 end
@@ -30,14 +30,21 @@ function Ship:update(dt)
         self.velocity.x = self.velocity.x + accelerationX
         self.velocity.y = self.velocity.y + accelerationY
     elseif love.keyboard.isDown("down", "s") then
-        local deceleration = self.acceleration * 0.01 * dt
-        -- Reduce the x and y velocity of the ship by multiplying it by the deceleration
-        self.velocity.x = self.velocity.x - self.velocity.x * deceleration
-        self.velocity.y = self.velocity.y - self.velocity.y * deceleration
+        local deceleration = self.acceleration * 0.05 * dt -- Calculate deceleration based on ship's acceleration and delta time
+        local dotProduct = self.velocity.x * math.sin(self.rotation) + self.velocity.y * -math.cos(self.rotation) -- Calculate dot product of velocity and forward direction
+        local directionAngle = self:getDirectionAngle()
+        local decelerationFactor = 1 - math.abs(directionAngle) / 90 -- Calculate a deceleration factor based on direction angle
+        local adjustedDeceleration = deceleration * decelerationFactor -- Adjusted deceleration based on deceleration factor
+
+        -- Apply deceleration only if the dot product is positive (ship moving forward)
+        if dotProduct > 0 then
+            self.velocity.x = self.velocity.x - self.velocity.x * adjustedDeceleration
+            self.velocity.y = self.velocity.y - self.velocity.y * adjustedDeceleration
+        end
     end
 
     -- Calculate the total speed (modulo of the velocity vector)
-    local speed = math.sqrt(self.velocity.x^2 + self.velocity.y^2)
+    local speed = self:getSpeed()
     -- If the speed is higher than the maximum speed allowed, it reduces the speed to a fraction of the maximum speed
     if speed > self.maxSpeed then
         local scaleFactor = self.maxSpeed / speed
@@ -60,15 +67,17 @@ function Ship:draw()
 end
 
 function Ship:debug()
-    local speed = math.sqrt(self.velocity.x^2 + self.velocity.y^2)
+    local speed = self:getSpeed()
+    local directionAngle = self:getDirectionAngle()
     local debugText = {
         "Debug Info:",
         "x: " .. string.format("%.2f", self.x),
         "y: " .. string.format("%.2f", self.y),
-        "acceleration: " .. string.format("%.2f", self.acceleration),
-        "rotation: " .. string.format("%.2f", self.rotation),
+        "acceleration: " .. string.format("%.2f", love.keyboard.isDown("w", "up") and self.acceleration or 0),
+        "rotation: " .. string.format("%.2f", self.rotation % 6.28),
         "velocity: x=" .. string.format("%.2f", self.velocity.x) .. ", y=" .. string.format("%.2f", self.velocity.y),
-        "speed: " .. string.format("%.2f", speed)
+        "speed: " .. string.format("%.2f", speed),
+        "directionAngle: " .. string.format("%.2f", directionAngle)
     }
 
     love.graphics.setColor(1, 1, 1)
@@ -76,6 +85,29 @@ function Ship:debug()
     for i, textLine in ipairs(debugText) do
         love.graphics.print(textLine, 10, 10 + (i - 1) * lineHeight)
     end
+end
+
+-- Calculate and return the magnitude of the velocity vector, representing the speed of the ship
+function Ship:getSpeed()
+    return math.sqrt(self.velocity.x^2 + self.velocity.y^2)
+end
+
+-- Calculate and return the direction of the ship in radians based on its velocity vector
+function Ship:getShipDirection()
+    return math.atan2(self.velocity.y, self.velocity.x);
+end
+
+-- Calculate and return the angle of direction (orientation) of the ship in degrees, considering its current rotation
+function Ship:getDirectionAngle()
+    -- Calculate the ship's direction angle based on its velocity direction and rotation
+    local shipDirection = self:getShipDirection()
+    local directionAngle = (math.deg(shipDirection - self.rotation) + 90) % 360
+    -- Adjust the angle to be within the range [-180, 180]
+    if directionAngle > 180 then
+        directionAngle = directionAngle - 360
+    end
+
+    return directionAngle
 end
 
 -- This line returns the Ship table to make the class available for import and use in other files.

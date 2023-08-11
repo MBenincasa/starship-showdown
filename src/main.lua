@@ -6,6 +6,7 @@ local ship
 
 -- This method is called only once at the beginning of the game's execution.
 function love.load()
+    -- love._openConsole()
     love.window.setTitle("Starship Showdown")
     love.window.setMode(1280, 720)
     ship = Ship.new()
