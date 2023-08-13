@@ -6,9 +6,10 @@ function Ship.new(x, y)
     self.x = x or 640
     self.y = y or 600
     self.velocity = { x = 0, y = 0 } -- Velocity vector
-    self.acceleration = 50 -- Ship acceleration
-    self.maxSpeed = 100 -- Maximum speed of the ship
+    self.acceleration = 200 -- Ship acceleration
+    self.maxSpeed = 300 -- Maximum speed of the ship
     self.rotation = 0 -- Rotation angle of the ship in radians
+    self.frictionCoefficient = 0.3 -- Friction coefficient
     return self
 end
 
@@ -17,7 +18,7 @@ function Ship:update(dt)
     if love.keyboard.isDown("left", "a") then
         self.rotation = self.rotation - math.rad(100) * dt -- Rotates the ship to the left by subtracting a certain angle in radians
     elseif love.keyboard.isDown("right", "d") then
-        self.rotation = self.rotation + math.rad(100) * dt -- Rotate the ship to the right by adding a certain angle in radians
+        self.rotation = self.rotation + math.rad(100) * dt -- Rotates the ship to the right by adding a certain angle in radians
     end
 
     if love.keyboard.isDown("up", "w") then
@@ -30,7 +31,7 @@ function Ship:update(dt)
         self.velocity.x = self.velocity.x + accelerationX
         self.velocity.y = self.velocity.y + accelerationY
     elseif love.keyboard.isDown("down", "s") then
-        local deceleration = self.acceleration * 0.05 * dt -- Calculate deceleration based on ship's acceleration and delta time
+        local deceleration = self.acceleration * 0.005 * dt -- Calculate deceleration based on ship's acceleration and delta time
         local dotProduct = self.velocity.x * math.sin(self.rotation) + self.velocity.y * -math.cos(self.rotation) -- Calculate dot product of velocity and forward direction
         local directionAngle = self:getDirectionAngle()
 
@@ -47,10 +48,23 @@ function Ship:update(dt)
             self.velocity.y = self.velocity.y + self.velocity.y * deceleration * decelerationFactor
         end
     end
-    
 
+    -- Calculate friction based on current velocity (always present)
+    local frictionX = -self.velocity.x * self.frictionCoefficient
+    local frictionY = -self.velocity.y * self.frictionCoefficient
+
+    -- Add friction to velocity
+    self.velocity.x = self.velocity.x + frictionX * dt
+    self.velocity.y = self.velocity.y + frictionY * dt
+
+    local minSpeed = 0 -- Limits the minimum speed due to friction
     -- Calculate the total speed (modulo of the velocity vector)
     local speed = self:getSpeed()
+    if speed < minSpeed then
+        self.velocity.x = 0
+        self.velocity.y = 0
+    end
+
     -- If the speed is higher than the maximum speed allowed, it reduces the speed to a fraction of the maximum speed
     if speed > self.maxSpeed then
         local scaleFactor = self.maxSpeed / speed
@@ -79,11 +93,13 @@ function Ship:debug()
         "Debug Info:",
         "x: " .. string.format("%.2f", self.x),
         "y: " .. string.format("%.2f", self.y),
-        "acceleration: " .. string.format("%.2f", love.keyboard.isDown("w", "up") and self.acceleration or 0),
-        "rotation: " .. string.format("%.2f", self.rotation % 6.28),
+        "acceleration: " .. string.format("%.2f", love.keyboard.isDown("w", "up") and self.acceleration or 0) .. " px/s²",
+        "brake: " .. (love.keyboard.isDown("s", "down") and "Pressed" or "Not pressed"),
+        "rotation: " .. string.format("%.2f", self.rotation % 6.28) .. " rad",
         "velocity: x=" .. string.format("%.2f", self.velocity.x) .. ", y=" .. string.format("%.2f", self.velocity.y),
-        "speed: " .. string.format("%.2f", speed),
-        "directionAngle: " .. string.format("%.2f", directionAngle)
+        "speed: " .. string.format("%.2f", speed) .. " px/s",
+        "directionAngle: " .. string.format("%.2f", directionAngle) .. "°",
+        "frictionCoefficient: " .. self.frictionCoefficient
     }
 
     love.graphics.setColor(1, 1, 1)
