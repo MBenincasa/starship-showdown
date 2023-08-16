@@ -1,7 +1,7 @@
 -- Imports
-local Ship = require("objects/ship")
-local Checkpoint = require("objects/checkpoint")
-local Settings = require("settings")
+local Ship = require("src.objects.ship")
+local Checkpoint = require("src.objects.checkpoint")
+local Settings = require("src.settings")
 
 local Game = {} -- Declaration of an empty table named "Game"
 Game.__index = Game -- Set the index of the "Game" table to itself

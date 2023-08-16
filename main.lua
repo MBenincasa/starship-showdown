@@ -1,7 +1,7 @@
 -- Imports
 love.audio = require("love.audio")
-local Game = require("game")
-local Settings = require("settings")
+local Game = require("src.game")
+local Settings = require("src.settings")
 
 -- Variables
 local game
@@ -14,7 +14,7 @@ function love.load()
     love.window.setMode(1280, 720)
 
     -- Loads the audio file
-    backgroundMusic = love.audio.newSource("resources/background.mp3", "stream")
+    backgroundMusic = love.audio.newSource("src/resources/background.mp3", "stream")
     backgroundMusic:setLooping(true)
     -- Start audio playback
     love.audio.play(backgroundMusic)
