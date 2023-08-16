@@ -1,12 +1,23 @@
 -- Imports
+love.audio = require("love.audio")
 local Game = require("game")
+
 -- Variables
 local game
+local backgroundMusic
+
 -- This method is called only once at the beginning of the game's execution.
 function love.load()
     -- love._openConsole()
     love.window.setTitle("Starship Showdown")
     love.window.setMode(1280, 720)
+
+    -- Loads the audio file
+    backgroundMusic = love.audio.newSource("resources/background.mp3", "stream")
+    backgroundMusic:setLooping(true)
+    -- Start audio playback
+    love.audio.play(backgroundMusic)
+
     game = Game.new()
 end
 
