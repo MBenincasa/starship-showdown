@@ -102,10 +102,14 @@ function Ship:debug()
         "frictionCoefficient: " .. self.frictionCoefficient
     }
 
-    love.graphics.setColor(1, 1, 1)
     local lineHeight = 20
+    local windowWidth, windowHeight = love.graphics.getWidth(), love.graphics.getHeight()
+
+    love.graphics.setColor(1, 1, 1)
     for i, textLine in ipairs(debugText) do
-        love.graphics.print(textLine, 10, 10 + (i - 1) * lineHeight)
+        local x = windowWidth - love.graphics.getFont():getWidth(textLine) - 10
+        local y = windowHeight - 10 - (#debugText - i + 1) * lineHeight
+        love.graphics.print(textLine, x, y)
     end
 end
 
