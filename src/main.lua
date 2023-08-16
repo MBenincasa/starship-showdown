@@ -1,6 +1,7 @@
 -- Imports
 love.audio = require("love.audio")
 local Game = require("game")
+local Settings = require("settings")
 
 -- Variables
 local game
@@ -23,10 +24,18 @@ end
 
 -- This method is called during every game cycle. It receives the parameter dt (delta time), which represents the time interval elapsed between the previous frame and the current one.
 function love.update(dt)
-    game:update(dt)
+    if not Settings.isMenuOpen then
+        game:update(dt) -- Update only if the settings menu is not open
+    end
+    backgroundMusic:setVolume(Settings.isMusicEnabled and 1 or 0)
 end
 
 -- This method is called immediately after love.update() within the game cycle. This is where objects, images, and any visual elements on the screen are drawn.
 function love.draw()
     game:draw()
+end
+
+-- This function is called whenever a key is pressed.
+function love.keypressed(key)
+    Settings:keypressed(key) -- Delegate the key press handling to the Settings module.
 end

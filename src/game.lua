@@ -1,6 +1,7 @@
 -- Imports
 local Ship = require("objects/ship")
 local Checkpoint = require("objects/checkpoint")
+local Settings = require("settings")
 
 local Game = {} -- Declaration of an empty table named "Game"
 Game.__index = Game -- Set the index of the "Game" table to itself
@@ -37,35 +38,40 @@ function Game:update(dt)
 end
 
 function Game:draw()
-    Checkpoint.draw(self.checkpoints, self.currentCheckpointIndex) -- Draw checkpoints with currentCheckpointIndex indicating the next checkpoint
-    self.ship:draw() -- Draw the ship
-    self.ship:debug() -- Draw debugging information for the ship
+    -- Check if the settings menu is open
+    if Settings.isMenuOpen then
+        Settings:drawSettingsMenu() -- If open, draw the settings menu.
+    else
+        Checkpoint.draw(self.checkpoints, self.currentCheckpointIndex) -- Draw checkpoints with currentCheckpointIndex indicating the next checkpoint
+        self.ship:draw() -- Draw the ship
+        self.ship:debug() -- Draw debugging information for the ship
 
-    love.graphics.setColor(1, 1, 1)
+        love.graphics.setColor(1, 1, 1)
 
-    local yOffset = 60 -- Vertical offset for lap time display
-    local lineHeight = 20 -- Height of each line
-    local xOffset = 10 -- Horizontal offset for lap time display
+        local yOffset = 60 -- Vertical offset for lap time display
+        local lineHeight = 20 -- Height of each line
+        local xOffset = 10 -- Horizontal offset for lap time display
 
-    -- Display lap times and total lap time in descending order
-    for lapIndex = #self.lapTimes, 1, -1 do
-        local lapTimes = self.lapTimes[lapIndex]
-        local lapTimeText = "LAP " .. lapIndex .. " - "
-        for checkpointIndex, time in ipairs(lapTimes) do
-            lapTimeText = lapTimeText .. "T" .. checkpointIndex .. ": " .. string.format("%.3f", time) .. "s "
+        -- Display lap times and total lap time in descending order
+        for lapIndex = #self.lapTimes, 1, -1 do
+            local lapTimes = self.lapTimes[lapIndex]
+            local lapTimeText = "LAP " .. lapIndex .. " - "
+            for checkpointIndex, time in ipairs(lapTimes) do
+                lapTimeText = lapTimeText .. "T" .. checkpointIndex .. ": " .. string.format("%.3f", time) .. "s "
+            end
+            lapTimeText = lapTimeText .. "- TOTAL: " .. self:getTotalLapTime(lapTimes) .. "s"
+            love.graphics.print(lapTimeText, xOffset, 10 + (lapIndex - 1) * lineHeight)
         end
-        lapTimeText = lapTimeText .. "- TOTAL: " .. self:getTotalLapTime(lapTimes) .. "s"
-        love.graphics.print(lapTimeText, xOffset, 10 + (lapIndex - 1) * lineHeight)
-    end
 
-    -- Display "Race Finished" if the race is finished
-    if self.isFinished then
-        love.graphics.print("Race Finished", xOffset, 720 - yOffset)
-    end
+        -- Display "Race Finished" if the race is finished
+        if self.isFinished then
+            love.graphics.print("Race Finished", xOffset, 720 - yOffset)
+        end
 
-    -- Display lap number in the top-right corner
-    if not self.isFinished then
-        love.graphics.print("Lap: " .. self.lap .. "/" .. self.maxLaps, 1280 - 120, 10)
+        -- Display lap number in the top-right corner
+        if not self.isFinished then
+            love.graphics.print("Lap: " .. self.lap .. "/" .. self.maxLaps, 1280 - 120, 10)
+        end
     end
 end
 
