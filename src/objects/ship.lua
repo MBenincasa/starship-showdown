@@ -6,8 +6,8 @@ function Ship.new(x, y)
     self.x = x or 640
     self.y = y or 600
     self.velocity = { x = 0, y = 0 } -- Velocity vector
-    self.acceleration = 200 -- Ship acceleration
-    self.maxSpeed = 300 -- Maximum speed of the ship
+    self.acceleration = 70 -- Ship acceleration
+    self.maxSpeed = 105 -- Maximum speed of the ship
     self.rotation = 0 -- Rotation angle of the ship in radians
     self.frictionCoefficient = 0.3 -- Friction coefficient
     return self

@@ -1,5 +1,6 @@
 -- Imports
 local Ship = require("src.objects.ship")
+local Rival = require("src.objects.rival")
 local Checkpoint = require("src.objects.checkpoint")
 local Settings = require("src.settings")
 
@@ -14,6 +15,7 @@ function Game.new()
         Checkpoint.new(300, 600, 2),
         Checkpoint.new(640, 100, 3)
     }
+    self.rival = Rival.new(self.checkpoints) -- Initialize the rival's ship object using the Rival class
     self.currentCheckpointIndex = 1 -- Set the current checkpoint index to 1
     self.lap = 1 -- Initialize lap counter to 1
     self.timer = 0 -- Initialize timer to 0
@@ -28,6 +30,7 @@ end
 function Game:update(dt)
     if self.isRunning then
         self.ship:update(dt) -- Update the ship's state based on the delta time (dt)
+        self.rival:update(dt) -- Update the rival's ship
         self:checkCollisions() -- Check for collisions with checkpoints
         self.timer = self.timer + dt -- Increment the timer by the delta time
     end
@@ -44,6 +47,7 @@ function Game:draw()
     else
         Checkpoint.draw(self.checkpoints, self.currentCheckpointIndex) -- Draw checkpoints with currentCheckpointIndex indicating the next checkpoint
         self.ship:draw() -- Draw the ship
+        self.rival:draw() -- Draw the rival's ship
         self.ship:debug() -- Draw debugging information for the ship
 
         love.graphics.setColor(1, 1, 1)

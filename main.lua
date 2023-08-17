@@ -9,12 +9,17 @@ local backgroundMusic
 
 -- This method is called only once at the beginning of the game's execution.
 function love.load()
-    -- love._openConsole()
+    love._openConsole()
     love.window.setTitle("Starship Showdown")
     love.window.setMode(1280, 720)
 
+    -- Set a larger font size
+    local fontSize = 16
+    local font = love.graphics.newFont(fontSize)
+    love.graphics.setFont(font)
+
     -- Loads the audio file
-    backgroundMusic = love.audio.newSource("src/resources/background.mp3", "stream")
+    backgroundMusic = love.audio.newSource("resources/background.mp3", "stream")
     backgroundMusic:setLooping(true)
     -- Start audio playback
     love.audio.play(backgroundMusic)
