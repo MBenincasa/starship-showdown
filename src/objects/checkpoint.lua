@@ -6,7 +6,7 @@ function Checkpoint.new(x, y, order)
     self.x = x
     self.y = y
     self.order = order -- Order/index of the checkpoint
-    self.radius = 20 -- Radius of the checkpoint circle
+    self.radius = 30 -- Radius of the checkpoint circle
     self.passed = false -- Flag indicating if the ship has passed this checkpoint
     return self
 end
