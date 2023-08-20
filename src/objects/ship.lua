@@ -6,75 +6,29 @@ function Ship.new(x, y)
     self.x = x or 640
     self.y = y or 600
     self.velocity = { x = 0, y = 0 } -- Velocity vector
-    self.acceleration = 70 -- Ship acceleration
-    self.maxSpeed = 105 -- Maximum speed of the ship
+    self.acceleration = 150 -- Ship acceleration
+    self.maxSpeed = 225 -- Maximum speed of the ship
     self.rotation = 0 -- Rotation angle of the ship in radians
     self.frictionCoefficient = 0.3 -- Friction coefficient
+    self.turnSpeed = 90 -- Ship's turning speed (in radians per second)
     return self
 end
 
 -- This update method defines the update behavior of the ship
 function Ship:update(dt)
     if love.keyboard.isDown("left", "a") then
-        self.rotation = self.rotation - math.rad(100) * dt -- Rotates the ship to the left by subtracting a certain angle in radians
+        self:rotateToLeft(dt)
     elseif love.keyboard.isDown("right", "d") then
-        self.rotation = self.rotation + math.rad(100) * dt -- Rotates the ship to the right by adding a certain angle in radians
+        self:rotateToRight(dt)
     end
 
     if love.keyboard.isDown("up", "w") then
-        -- Calculate acceleration multiplied by delta time (dt)
-        local acceleration = self.acceleration * dt
-        -- Calculate acceleration along the x and y axes using trigonometric functions
-        local accelerationX = math.sin(self.rotation) * acceleration
-        local accelerationY = -math.cos(self.rotation) * acceleration
-        -- Updates x and y velocity of ship with calculated acceleration
-        self.velocity.x = self.velocity.x + accelerationX
-        self.velocity.y = self.velocity.y + accelerationY
+        self:accelerate(dt)
     elseif love.keyboard.isDown("down", "s") then
-        local deceleration = self.acceleration * 0.005 * dt -- Calculate deceleration based on ship's acceleration and delta time
-        local dotProduct = self.velocity.x * math.sin(self.rotation) + self.velocity.y * -math.cos(self.rotation) -- Calculate dot product of velocity and forward direction
-        local directionAngle = self:getDirectionAngle()
-
-        -- Calculate the factor by which to scale the deceleration based on direction angle
-        local decelerationFactor = 1 - math.abs(directionAngle) / 90
-
-        if dotProduct > 0 then
-            -- Apply deceleration in the forward direction
-            self.velocity.x = self.velocity.x - self.velocity.x * deceleration * decelerationFactor
-            self.velocity.y = self.velocity.y - self.velocity.y * deceleration * decelerationFactor
-        else
-            -- Apply deceleration in the backward direction
-            self.velocity.x = self.velocity.x + self.velocity.x * deceleration * decelerationFactor
-            self.velocity.y = self.velocity.y + self.velocity.y * deceleration * decelerationFactor
-        end
+        self:brake(dt)
     end
 
-    -- Calculate friction based on current velocity (always present)
-    local frictionX = -self.velocity.x * self.frictionCoefficient
-    local frictionY = -self.velocity.y * self.frictionCoefficient
-
-    -- Add friction to velocity
-    self.velocity.x = self.velocity.x + frictionX * dt
-    self.velocity.y = self.velocity.y + frictionY * dt
-
-    local minSpeed = 0 -- Limits the minimum speed due to friction
-    -- Calculate the total speed (modulo of the velocity vector)
-    local speed = self:getSpeed()
-    if speed < minSpeed then
-        self.velocity.x = 0
-        self.velocity.y = 0
-    end
-
-    -- If the speed is higher than the maximum speed allowed, it reduces the speed to a fraction of the maximum speed
-    if speed > self.maxSpeed then
-        local scaleFactor = self.maxSpeed / speed
-        self.velocity.x = self.velocity.x * scaleFactor
-        self.velocity.y = self.velocity.y * scaleFactor
-    end
-
-    -- Update ship's x and y position based on current velocity
-    self.x = self.x + self.velocity.x * dt
-    self.y = self.y + self.velocity.y * dt
+    self:calculateNextPosition(dt)
 end
 
 -- This draw method defines how the ship is drawn on the screen
@@ -134,6 +88,73 @@ function Ship:getDirectionAngle()
     end
 
     return directionAngle
+end
+
+function Ship:accelerate(dt)
+    -- Calculate acceleration multiplied by delta time (dt)
+    local acceleration = self.acceleration * dt
+    -- Calculate acceleration along the x and y axes using trigonometric functions
+    local accelerationX = math.sin(self.rotation) * acceleration
+    local accelerationY = -math.cos(self.rotation) * acceleration
+    -- Updates x and y velocity of ship with calculated acceleration
+    self.velocity.x = self.velocity.x + accelerationX
+    self.velocity.y = self.velocity.y + accelerationY
+end
+
+function Ship:brake(dt)
+    local deceleration = self.acceleration * 0.005 * dt -- Calculate deceleration based on ship's acceleration and delta time
+    local dotProduct = self.velocity.x * math.sin(self.rotation) + self.velocity.y * -math.cos(self.rotation) -- Calculate dot product of velocity and forward direction
+    local directionAngle = self:getDirectionAngle()
+
+    -- Calculate the factor by which to scale the deceleration based on direction angle
+    local decelerationFactor = 1 - math.abs(directionAngle) / 90
+
+    if dotProduct > 0 then
+        -- Apply deceleration in the forward direction
+        self.velocity.x = self.velocity.x - self.velocity.x * deceleration * decelerationFactor
+        self.velocity.y = self.velocity.y - self.velocity.y * deceleration * decelerationFactor
+    else
+        -- Apply deceleration in the backward direction
+        self.velocity.x = self.velocity.x + self.velocity.x * deceleration * decelerationFactor
+        self.velocity.y = self.velocity.y + self.velocity.y * deceleration * decelerationFactor
+    end
+end
+
+function Ship:rotateToRight(dt)
+    self.rotation = self.rotation + math.rad(self.turnSpeed) * dt -- Rotates the ship to the right by adding a certain angle in radians
+end
+
+function Ship:rotateToLeft(dt)
+    self.rotation = self.rotation - math.rad(self.turnSpeed) * dt -- Rotates the ship to the left by subtracting a certain angle in radians
+end
+
+function Ship:calculateNextPosition(dt)
+    -- Calculate friction based on current velocity (always present)
+    local frictionX = -self.velocity.x * self.frictionCoefficient
+    local frictionY = -self.velocity.y * self.frictionCoefficient
+
+    -- Add friction to velocity
+    self.velocity.x = self.velocity.x + frictionX * dt
+    self.velocity.y = self.velocity.y + frictionY * dt
+
+    local minSpeed = 0 -- Limits the minimum speed due to friction
+    -- Calculate the total speed (modulo of the velocity vector)
+    local speed = self:getSpeed()
+    if speed < minSpeed then
+        self.velocity.x = 0
+        self.velocity.y = 0
+    end
+
+    -- If the speed is higher than the maximum speed allowed, it reduces the speed to a fraction of the maximum speed
+    if speed > self.maxSpeed then
+        local scaleFactor = self.maxSpeed / speed
+        self.velocity.x = self.velocity.x * scaleFactor
+        self.velocity.y = self.velocity.y * scaleFactor
+    end
+
+    -- Update ship's x and y position based on current velocity
+    self.x = self.x + self.velocity.x * dt
+    self.y = self.y + self.velocity.y * dt
 end
 
 -- This line returns the Ship table to make the class available for import and use in other files.
