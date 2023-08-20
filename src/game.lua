@@ -127,16 +127,14 @@ function Game:checkCollisions()
     -- Check if the ship is close to the checkpoint and hasn't passed it already
     if distanceToCheckpoint <= currentCheckpoint.radius and not currentCheckpoint.passed then
         currentCheckpoint.passed = true -- Mark the checkpoint as passed
-
         table.insert(self.checkpointTimes, self.timer) -- Store the time taken to reach the checkpoint
 
         self.timer = 0 -- Reset the lap timer
-
         self.currentCheckpointIndex = self.currentCheckpointIndex + 1 -- Move to the next checkpoint
 
         if self.currentCheckpointIndex > #self.checkpoints then
             self.currentCheckpointIndex = 1 -- Wrap around to the first checkpoint if all checkpoints are passed
-            self:completeLap() -- Complete a lap when all checkpoints are passed
+            self:completePlayerLap() -- Complete a lap when all checkpoints are passed
         end
     end
 end
@@ -148,13 +146,10 @@ function Game:checkRivalCollisions()
     end
 
     local rivalCurrentCheckpoint = self.rival.checkpoints[self.rival.currentCheckpointIndex] -- Get the current checkpoint for the Rival
-
     -- Calculate distances to the checkpoints for both Ship and Rival
     local distanceToCheckpoint = math.sqrt((self.rival.ship.x - rivalCurrentCheckpoint.x)^2 + (self.rival.ship.y - rivalCurrentCheckpoint.y)^2)
-
     -- Check if the rival is close to the checkpoint and hasn't passed it already
     if distanceToCheckpoint <= rivalCurrentCheckpoint.radius then
-
         table.insert(self.rivalCheckpointTimes, self.rivalTimer) -- Store the time taken by Ship to reach the checkpoint
 
         self.rivalTimer = 0 -- Reset the lap timer
@@ -168,7 +163,7 @@ function Game:checkRivalCollisions()
 end
 
 -- Method to complete a lap for the Ship
-function Game:completeLap()
+function Game:completePlayerLap()
     table.insert(self.lapTimes, self.checkpointTimes) -- Store the checkpoint times for the completed lap
     self.checkpointTimes = {} -- Reset checkpoint times for the next lap
 

@@ -23,17 +23,19 @@ function Rival:update(dt)
     local angleToCheckpoint = math.atan2(dy, dx) + math.rad(90)
     local angleDifference = (angleToCheckpoint - self.ship.rotation) % (2 * math.pi)
 
-    if angleDifference > math.pi or angleDifference < 0 then
+    if (angleDifference > math.pi or angleDifference < 0) then
         self.ship:rotateToLeft(dt)
-    elseif angleDifference < -math.pi or angleDifference > 0 then
+    elseif (angleDifference < math.pi or angleDifference > 0) then
         self.ship:rotateToRight(dt)
     end
 
     local speed = self.ship:getSpeed()
-    if distanceToCheckpoint > 150 or speed < 50 then
+    if (distanceToCheckpoint < 200 and speed > 70) or (distanceToCheckpoint < 50 and speed > 50) then
+        self.ship:brake(dt)
+    else
         self.ship:accelerate(dt)
     end
-    
+
     self.ship:calculateNextPosition(dt)
 end
 
