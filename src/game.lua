@@ -12,9 +12,9 @@ function Game.new()
     local self = setmetatable({}, Game) -- Create a new instance of the Game class
     self.ship = Ship.new() -- Initialize the ship object using the Ship class
     self.checkpoints = { -- Initialize the list of checkpoints
-        Checkpoint.new(200, 200, 1), -- Create a new checkpoint at position (200, 200) with ID 1
-        Checkpoint.new(300, 600, 2), -- Create a new checkpoint at position (300, 600) with ID 2
-        Checkpoint.new(640, 100, 3)  -- Create a new checkpoint at position (640, 100) with ID 3
+        Checkpoint.new(100, 100, 1), -- Create a new checkpoint at position (200, 200) with ID 1
+        Checkpoint.new(300, 640, 2), -- Create a new checkpoint at position (300, 600) with ID 2
+        Checkpoint.new(640, 200, 3)  -- Create a new checkpoint at position (640, 100) with ID 3
     }
     self.rival = Rival.new(self.checkpoints) -- Initialize the rival's ship object using the Rival class
     self.currentCheckpointIndex = 1 -- Set the current checkpoint index to 1
