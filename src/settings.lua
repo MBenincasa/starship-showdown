@@ -16,6 +16,10 @@ function Settings:drawSettingsMenu()
     local optionExitGame = "3. Exit Game"
 
     -- Calculate text dimensions
+    local fontSize = 24
+    local font = love.graphics.newFont(fontSize)
+    love.graphics.setFont(font)
+
     local textHeight = love.graphics.getFont():getHeight()
     local titleWidth = love.graphics.getFont():getWidth(menuTitle)
     local optionWidth = math.max(
@@ -32,6 +36,10 @@ function Settings:drawSettingsMenu()
     love.graphics.print(optionToggleMusic, (windowWidth - optionWidth) / 2, startY + textHeight) -- Display the option to toggle music on/off.
     love.graphics.print(optionRestartGame, (windowWidth - optionWidth) / 2, startY + textHeight * 2) -- Display the option to restart the game.
     love.graphics.print(optionExitGame, (windowWidth - optionWidth) / 2, startY + textHeight * 3) -- Display the option to exit the game.
+
+    fontSize = 14
+    font = love.graphics.newFont(fontSize)
+    love.graphics.setFont(font)
 end
 
 -- Define a function to handle key presses for settings.

@@ -6,11 +6,12 @@ function Ship.new(x, y)
     self.x = x or 640
     self.y = y or 600
     self.velocity = { x = 0, y = 0 } -- Velocity vector
-    self.acceleration = 150 -- Ship acceleration
-    self.maxSpeed = 225 -- Maximum speed of the ship
+    self.acceleration = 160 -- Ship acceleration
+    self.maxSpeed = 240 -- Maximum speed of the ship
     self.rotation = 0 -- Rotation angle of the ship in radians
-    self.frictionCoefficient = 0.3 -- Friction coefficient
+    self.frictionCoefficient = 0.5 -- Friction coefficient
     self.turnSpeed = 90 -- Ship's turning speed (in radians per second)
+    self.isRespawned = false
     return self
 end
 
@@ -26,6 +27,14 @@ function Ship:update(dt)
         self:accelerate(dt)
     elseif love.keyboard.isDown("down", "s") then
         self:brake(dt)
+    end
+
+    if love.keyboard.isDown("r") then
+        self.x = 640
+        self.y = 600
+        self.rotation = 0
+        self.velocity = { x = 0, y = 0 }
+        self.isRespawned = true
     end
 
     self:calculateNextPosition(dt)

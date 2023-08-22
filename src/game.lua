@@ -12,9 +12,9 @@ function Game.new()
     local self = setmetatable({}, Game) -- Create a new instance of the Game class
     self.ship = Ship.new() -- Initialize the ship object using the Ship class
     self.checkpoints = { -- Initialize the list of checkpoints
-        Checkpoint.new(100, 100, 1), -- Create a new checkpoint at position (200, 200) with ID 1
-        Checkpoint.new(300, 640, 2), -- Create a new checkpoint at position (300, 600) with ID 2
-        Checkpoint.new(640, 200, 3)  -- Create a new checkpoint at position (640, 100) with ID 3
+        Checkpoint.new(200, 200, 1),
+        Checkpoint.new(400, 740, 2),
+        Checkpoint.new(740, 300, 3)
     }
     self.rival = Rival.new(self.checkpoints) -- Initialize the rival's ship object using the Rival class
     self.currentCheckpointIndex = 1 -- Set the current checkpoint index to 1
@@ -40,6 +40,11 @@ function Game:update(dt)
         self.ship:update(dt) -- Update the ship's state based on the delta time (dt)
         self:checkCollisions() -- Check for collisions with checkpoints
         self.timer = self.timer + dt -- Increment the timer by the delta time
+
+        if self.ship.isRespawned then
+            self.timer = self.timer + (50 * dt)
+            self.ship.isRespawned = false
+        end
     end
 
     if self.isRivalRunning then
@@ -102,7 +107,7 @@ function Game:draw()
 
         -- Display "Race Finished" if the race is finished
         if self.isFinished then
-            love.graphics.print("Race Finished", xOffset, 720 - yOffset)
+            love.graphics.print("Race Finished", xOffset, love.graphics.getHeight() - yOffset)
         end
 
         -- Display lap number in the top-center

@@ -11,10 +11,19 @@ local backgroundMusic
 function love.load()
     -- love._openConsole()
     love.window.setTitle("Starship Showdown")
-    love.window.setMode(1280, 720)
+
+    -- Get the width and height of the current desktop resolution
+    local desktopWidth, desktopHeight = love.window.getDesktopDimensions()
+
+    -- Set the window mode to match the desktop resolution
+    love.window.setMode(desktopWidth, desktopHeight, {
+        fullscreen = true,  -- Set fullscreen mode
+        resizable = true,   -- Allow window resizing
+        vsync = true        -- Enable vertical synchronization
+    })
 
     -- Set a larger font size
-    local fontSize = 16
+    local fontSize = 14
     local font = love.graphics.newFont(fontSize)
     love.graphics.setFont(font)
 

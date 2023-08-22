@@ -20,11 +20,21 @@ function Rival:update(dt)
     local dx = currentCheckpoint.x - self.ship.x
     local dy = currentCheckpoint.y - self.ship.y
     local distanceToCheckpoint = math.sqrt(dx^2 + dy^2)
-    local angleToCheckpoint = math.atan2(dy, dx) + math.rad(90)
-    local angleDifference = (angleToCheckpoint - self.ship.rotation) % (2 * math.pi)
-
+    local angleToCheckpoint = math.atan2(dy, dx) + math.rad(90) -- Calculate the angle to the current checkpoint
+    local angleToDirection = math.atan2(self.ship.velocity.y, self.ship.velocity.x) + math.rad(90) -- Calculate the angle to the ship's velocity direction
+    local anglePositionDifference = (angleToCheckpoint - self.ship.rotation) % (2 * math.pi)  -- Calculate the angle difference between the ship's current rotation and the checkpoint
+    local angleDirectionDifference = (angleToCheckpoint - angleToDirection) % (2 * math.pi) -- Calculate the angle difference between the checkpoint and the ship's velocity direction
     local speed = self.ship:getSpeed()
-    if distanceToCheckpoint < 50 then
+
+    -- When the distance to the checkpoint is small and the ship's speed is high, adjust orientation
+    if distanceToCheckpoint < 310 and distanceToCheckpoint >= 40 and speed > 90 then
+        if (angleDirectionDifference > math.pi) then
+            self.ship:rotateToLeft(dt)
+        elseif (angleDirectionDifference < math.pi or angleDirectionDifference > 0) then
+            self.ship:rotateToRight(dt)
+        end
+    -- When close to the checkpoint, move to the next checkpoint
+    elseif distanceToCheckpoint < 43 then
         currentCheckpointIndex = currentCheckpointIndex + 1
         if currentCheckpointIndex > #self.checkpoints then
             currentCheckpointIndex = 1
@@ -34,16 +44,23 @@ function Rival:update(dt)
         dy = currentCheckpoint.y - self.ship.y
         distanceToCheckpoint = math.sqrt(dx^2 + dy^2)
         angleToCheckpoint = math.atan2(dy, dx) + math.rad(90)
-        angleDifference = (angleToCheckpoint - self.ship.rotation) % (2 * math.pi)
+        anglePositionDifference = (angleToCheckpoint - self.ship.rotation) % (2 * math.pi)
+        if (anglePositionDifference > math.pi) then
+            self.ship:rotateToLeft(dt)
+        elseif (anglePositionDifference < math.pi or anglePositionDifference > 0) then
+            self.ship:rotateToRight(dt)
+        end
+    else
+        -- Adjust orientation based on the angle between current orientation and desired direction
+        if (anglePositionDifference > math.pi) then
+            self.ship:rotateToLeft(dt)
+        elseif (anglePositionDifference < math.pi or anglePositionDifference > 0) then
+            self.ship:rotateToRight(dt)
+        end
     end
 
-    if (angleDifference > math.pi) then
-        self.ship:rotateToLeft(dt)
-    elseif (angleDifference < math.pi or angleDifference > 0) then
-        self.ship:rotateToRight(dt)
-    end
-
-    if (distanceToCheckpoint < 200 and speed > 70) then
+    -- Apply braking or acceleration based on distance and speed
+    if ((distanceToCheckpoint < 170 and distanceToCheckpoint >= 70 and speed > 110) or (distanceToCheckpoint < 70 and speed > 60)) then
         self.ship:brake(dt)
     else
         self.ship:accelerate(dt)
