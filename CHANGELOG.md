@@ -1,9 +1,19 @@
 # Changelog
 
+## Version 0.2.0
+
+### Features
+- Added an AI-controlled Ship Rival that competes against the player, following checkpoints and providing challenging races.
+- Introduced ship respawn functionality with a time penalty.
+
+### Improvements
+- Improved window size creation by dynamically adapting to monitor information, enhancing the gaming experience.
+
+
+
 ## Version 0.1.0
 
 ### Features
-
 - Added basic spaceship controls for navigation.
 - Implemented checkpoints for completing laps.
 - Added lap counting and timer functionality.

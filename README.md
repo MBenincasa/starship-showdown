@@ -19,6 +19,7 @@ Welcome to Starship Showdown, a thrilling racing game that puts you in the pilot
 - **Dynamic Environments:** Race across a variety of dynamic and visually stunning space environments, each with its own challenges and obstacles.
 - **Competitive Racing:** Test your racing skills against AI opponents, aiming to set the fastest lap times and claim the winner's podium.
 - **Interactive Settings Menu:** Access an intuitive settings menu to toggle background music, pause the game, and more.
+- **AI Opponent:** Compete against advanced AI opponent that provides challenging and engaging races.
 
 ## Controls
 - Use the arrow keys to control the ship's movement.
@@ -26,6 +27,7 @@ Welcome to Starship Showdown, a thrilling racing game that puts you in the pilot
 - Press the "S" key to brake the ship.
 - Press the "A" and "D" keys to rotate the ship left and right.
 - Press the "Esc" key to open the settings menu.
+- Press the "R" key to respawn.
 
 ## Credits
 - Game developed by Mirko Benincasa
